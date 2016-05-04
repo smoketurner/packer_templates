@@ -67,7 +67,7 @@
     {
       "type": "ansible-local",
       "playbook_dir": "playbooks",
-      "playbook_file": "playbooks/local.yml",
+      "playbook_file": "playbooks/riak.yml",
       "inventory_file": "playbooks/inventory",
       "extra_arguments": []
     }

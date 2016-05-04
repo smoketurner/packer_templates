@@ -1,11 +1,6 @@
 ---
 # Installs CloudWatch Logs Agent
 
-- name: Download and extract awslogs
-  get_url: url=https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py
-           dest=/tmp/awslogs-agent-setup.py
-           mode=0755
-
 - name: Create awslogs configuration directory
   file: path=/var/awslogs/etc/config
         state=directory
@@ -19,6 +14,11 @@
         owner=root
         group=root
         mode=0644
+
+- name: Download and extract awslogs
+  get_url: url=https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py
+           dest=/tmp/awslogs-agent-setup.py
+           mode=0755
 
 - name: Install awslogs
   command: python ./awslogs-agent-setup.py -r us-east-1 -n -c awslogs.conf

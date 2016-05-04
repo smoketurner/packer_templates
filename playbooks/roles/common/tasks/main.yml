@@ -12,6 +12,7 @@
     - sudo
     - htop
     - atop
+    - jq
     - apt-transport-https
     - unattended-upgrades
 

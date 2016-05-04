@@ -7,7 +7,7 @@
         "cloudwatch:PutMetricData"
       ],
       "Resource": [
-        "*"
+        "arn:aws:cloudwatch:*:*:*"
       ]
     },
     {

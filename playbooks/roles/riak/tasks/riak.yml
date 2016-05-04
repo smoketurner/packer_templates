@@ -13,10 +13,10 @@
   apt: pkg=riak state=present update_cache=yes cache_valid_time=3600
 
 - name: Copy riak.conf into place
-  template: src=etc_riak_riak.conf.j2
-            dest=/etc/riak/riak.conf
-            owner=riak
-            group=riak
+  copy: src=etc_riak_riak.conf
+        dest=/etc/riak/riak.conf
+        owner=riak
+        group=riak
   notify: restart riak
 
 - name: mount the riak volume with optimized settings
@@ -31,13 +31,13 @@
             dest=/usr/local/bin/riak_disk_tune.sh
             owner=root
             group=root
-            mode=0755
+            mode=0750
   notify: run riak_disk_tune
 
-- name: add line to rc.local to call riak_disk_tune on boot
-  lineinfile: line="if [ -x /usr/local/bin/riak_disk_tune.sh ]; then /usr/local/bin/riak_disk_tune.sh; fi"
-              dest=/etc/rc.local
-              insertbefore="^exit 0"
+- name: Add cron entry to tune disks upon startup
+  cron: name="riak disk tune"
+        special_time="reboot"
+        job="/usr/local/bin/riak_disk_tune.sh"
 
 - name: Create /etc/default/riak
   copy: content="ulimit -n 65536"
@@ -70,6 +70,19 @@
         group=root
         mode=0644
   notify: restart awslogs
+
+- name: Install the Riak startup script
+  file: src=usr_local_bin_riak_startup.sh
+        dest=/usr/local/bin/riak_startup.sh
+        owner=root
+        group=root
+        mode=0750
+  notify: run riak_startup
+
+- name: Configuration Riak startup script to run upon startup
+  cron: name="riak startup"
+        job="/usr/local/bin/riak_startup.sh"
+        special_name="reboot"
 
 - name: Ensure Riak is running and enabled
   service: name=riak state=started enabled=yes

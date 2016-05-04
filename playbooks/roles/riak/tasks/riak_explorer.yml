@@ -1,0 +1,7 @@
+---
+# Installs Riak Explorer
+
+- name: Download and extract Riak Explorer
+  unarchive: src=https://github.com/basho-labs/riak_explorer/releases/download/0.2.0/riak_explorer-0.2.0-ubuntu-trusty-amd64.tar.gz
+             dest=/usr/local
+             copy=no
