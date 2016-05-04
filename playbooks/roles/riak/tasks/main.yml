@@ -2,3 +2,6 @@
 
 - include: riak.yml
   tags: riak
+
+- include: riak_metrics.yml
+  tags: riak
