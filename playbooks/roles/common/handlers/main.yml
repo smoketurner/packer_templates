@@ -1,0 +1,7 @@
+---
+
+- name: restart ntp
+  service: name=ntp state=restarted
+
+- name: restart awslogs
+  service: name=awslogs state=restarted

@@ -1,0 +1,23 @@
+---
+
+riak_node_name: 'riak@{{ ansible_fqdn }}'
+riak_ring_size: 64
+
+riak_pb_bind_ip: 0.0.0.0
+riak_pb_port: 8087
+
+riak_http_bind_ip: 0.0.0.0
+riak_http_port: 8098
+
+riak_net_speed: 1Gb
+
+# disk tuning
+riak_filesystem:    ext4
+riak_mountpoint:    /
+riak_mount_options: noatime,barrier=0,errors=remount-ro
+riak_partition:     /dev/xvda1
+riak_physical_disks:
+  - xvda
+
+# options
+riak_scheduler:     noop

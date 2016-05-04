@@ -1,0 +1,75 @@
+---
+# Installs Riak
+
+- name: Ensure repository key for packagecloud.io is in place
+  apt_key: url=https://packagecloud.io/gpg.key id=D59097AB state=present
+
+- name: Add packagecloud.io repository
+  apt_repository: repo="deb https://packagecloud.io/basho/riak/ubuntu/ trusty main"
+                  state=present
+                  update_cache=yes
+
+- name: Install Riak
+  apt: pkg=riak state=present update_cache=yes cache_valid_time=3600
+
+- name: Copy riak.conf into place
+  template: src=etc_riak_riak.conf.j2
+            dest=/etc/riak/riak.conf
+            owner=riak
+            group=riak
+  notify: restart riak
+
+- name: mount the riak volume with optimized settings
+  mount: name={{ riak_mountpoint }}
+         src={{ riak_partition }}
+         opts="{{ riak_mount_options }}"
+         fstype="{{ riak_filesystem }}"
+         state=mounted
+
+- name: create script with disk tuning commands
+  template: src=usr_local_bin_riak_disk_tune.sh.j2
+            dest=/usr/local/bin/riak_disk_tune.sh
+            owner=root
+            group=root
+            mode=0755
+  notify: run riak_disk_tune
+
+- name: add line to rc.local to call riak_disk_tune on boot
+  lineinfile: line="if [ -x /usr/local/bin/riak_disk_tune.sh ]; then /usr/local/bin/riak_disk_tune.sh; fi"
+              dest=/etc/rc.local
+              insertbefore="^exit 0"
+
+- name: Create /etc/default/riak
+  copy: content="ulimit -n 65536"
+        dest=/etc/default/riak
+        owner=root
+        group=root
+        mode=0644
+  notify: restart riak
+
+- name: Update open file limits for Riak
+  copy: src=etc_security_limits.d_riak.conf
+        dest=/etc/security/limits.d/riak.conf
+        owner=root
+        group=root
+        mode=0644
+  notify: restart riak
+
+- name: Optimize Riak sysctl settings
+  template: src=etc_sysctl.d_30-riak.conf.j2
+            dest=/etc/sysctl.d/30-riak.conf
+            owner=root
+            group=root
+            mode=0644
+  notify: restart riak
+
+- name: Configuration CloudWatch logs
+  copy: src=var_awslogs_etc_config_riak.conf
+        dest=/var/awslogs/etc/config/riak.conf
+        owner=root
+        group=root
+        mode=0644
+  notify: restart awslogs
+
+- name: Ensure Riak is running and enabled
+  service: name=riak state=started enabled=yes

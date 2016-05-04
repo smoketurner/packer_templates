@@ -1,0 +1,17 @@
+---
+# Installs Riak CloudWatch metrics script
+
+- name: Install boto3
+  pip: name=boto3 state=present
+
+- name: Install metrics collection script
+  copy: src=usr_local_bin_riak_metrics.py
+        dest=/usr/local/bin/riak_metrics.py
+        owner=root
+        group=root
+        mode=0755
+
+- name: Set up cronjob for metrics collection
+  cron: name="riak cloudwatch metrics"
+        job="/usr/local/bin/riak_metrics.py > /dev/null"
+        state=present

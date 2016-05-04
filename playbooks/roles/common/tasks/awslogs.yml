@@ -1,0 +1,30 @@
+---
+# Installs CloudWatch Logs Agent
+
+- name: Download and extract awslogs
+  get_url: url=https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py
+           dest=/tmp/awslogs-agent-setup.py
+           mode=0755
+
+- name: Create awslogs configuration directory
+  file: path=/var/awslogs/etc/config
+        state=directory
+        owner=root
+        group=root
+        mode=0755
+
+- name: Install temporary configuration file
+  copy: src=tmp_awslogs.conf
+        dest=/tmp/awslogs.conf
+        owner=root
+        group=root
+        mode=0644
+
+- name: Install awslogs
+  command: python ./awslogs-agent-setup.py -r us-east-1 -n -c awslogs.conf
+           chdir=/tmp
+           creates=/var/awslogs/bin/pip
+  notify: restart awslogs
+
+- name: Ensure awslogs is running and enabled
+  service: name=awslogs state=started enabled=yes

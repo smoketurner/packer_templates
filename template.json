@@ -1,0 +1,75 @@
+{
+  "variables": {
+    "version": "0.1.0",
+    "riak_version": "2.1.4",
+    "aws_access_key": "{{ env `AWS_ACCESS_KEY_ID` }}",
+    "aws_secret_key": "{{ env `AWS_SECRET_ACCESS_KEY` }}",
+    "aws_vpc_id": "vpc-0ef60669",
+    "aws_subnet_id": "subnet-07237571",
+    "user": "{{ env `USER` }}"
+  },
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "access_key": "{{ user `aws_access_key` }}",
+      "secret_key": "{{ user `aws_secret_key` }}",
+      "region": "us-east-1",
+      "source_ami": "ami-2b594f41",
+      "instance_type": "m4.large",
+      "ssh_username": "ubuntu",
+      "ami_name": "riak-{{ user `riak_version` }} {{ timestamp }}",
+      "ami_description": "Riak {{ user `riak_version` }} on Ubuntu 14.04 LTS HVM",
+      "ami_regions": [
+        "us-east-1"
+      ],
+      "ebs_optimized": true,
+      "enhanced_networking": true,
+      "associate_public_ip_address": true,
+      "ami_block_device_mappings": [
+        {
+          "device_name": "/dev/sda1",
+          "volume_type": "gp2",
+          "volume_size": 20,
+          "delete_on_termination": true
+        }
+      ],
+      "launch_block_device_mappings": [
+        {
+          "device_name": "/dev/sda1",
+          "volume_type": "gp2",
+          "volume_size": 20,
+          "delete_on_termination": true
+        }
+      ],
+      "vpc_id": "{{ user `aws_vpc_id` }}",
+      "subnet_id": "{{ user `aws_subnet_id` }}",
+      "tags": {
+        "Version": "{{ user `version` }}",
+        "Riak_Version": "{{ user `riak_version` }}",
+        "OS_Version": "Ubuntu",
+        "OS_Release": "14.04",
+        "Created_At": "{{ isotime \"2006-01-02\" }}",
+        "Created_By": "{{ user `user` }}"
+      }
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done",
+        "sudo apt-get update",
+        "sudo apt-get install -y python-dev python-pip libffi-dev libssl-dev",
+        "sudo pip install -U pip",
+        "sudo pip install -U ansible"
+      ]
+    },
+    {
+      "type": "ansible-local",
+      "playbook_dir": "playbooks",
+      "playbook_file": "playbooks/local.yml",
+      "inventory_file": "playbooks/inventory",
+      "extra_arguments": []
+    }
+  ]
+}

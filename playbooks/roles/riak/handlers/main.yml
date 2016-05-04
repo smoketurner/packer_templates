@@ -1,0 +1,7 @@
+---
+
+- name: restart riak
+  service: name=riak state=restarted
+
+- name: run riak_disk_tune
+  command: /usr/local/bin/riak_disk_tune.sh

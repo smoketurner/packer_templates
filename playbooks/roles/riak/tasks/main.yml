@@ -1,0 +1,4 @@
+---
+
+- include: riak.yml
+  tags: riak

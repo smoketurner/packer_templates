@@ -1,0 +1,33 @@
+---
+
+- name: Update apt cache
+  apt: update_cache=yes cache_valid_time=3600
+
+- name: Upgrade all safe packages
+  apt: upgrade=safe
+
+- name: Install necessities and nice-to-haves
+  apt: pkg={{ item }} state=present
+  with_items:
+    - sudo
+    - htop
+    - atop
+    - apt-transport-https
+    - unattended-upgrades
+
+- name: Remove puppet and chef
+  apt: pkg={{ item }} state=absent force=yes
+  with_items:
+    - chef
+    - chef-zero
+    - puppet
+    - puppet-common
+
+- include: ntp.yml
+  tags: ntp
+
+- include: java.yml
+  tags: java
+
+- include: awslogs.yml
+  tags: awslogs
