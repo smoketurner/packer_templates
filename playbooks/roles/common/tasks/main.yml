@@ -1,5 +1,8 @@
 ---
 
+- name: Gather facts
+  action: ec2_facts
+
 - name: Update apt cache
   apt: update_cache=yes cache_valid_time=3600
 
@@ -11,6 +14,8 @@
   with_items:
     - htop
     - atop
+    - jq
+    - wget
     - apt-transport-https
     - unattended-upgrades
 
@@ -24,9 +29,3 @@
 
 - include: ntp.yml
   tags: ntp
-
-- include: java.yml
-  tags: java
-
-- include: awslogs.yml
-  tags: awslogs

@@ -7,7 +7,7 @@ if [ $FOUND -eq 1 ]; then
     exit 0
 fi
 
-IP_ADDRESS=$(wget -q -O - http://169.254.169.254/latest/meta-data/local-ipv4)
+IP_ADDRESS=`wget -q -O - http://169.254.169.254/latest/meta-data/local-ipv4`
 echo "Discovered IP address: ${IP_ADDRESS}"
 
 echo "Stopping Riak..."

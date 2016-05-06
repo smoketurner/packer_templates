@@ -17,7 +17,6 @@
         dest=/etc/riak/riak.conf
         owner=riak
         group=riak
-  notify: restart riak
 
 - name: mount the riak volume with optimized settings
   mount: name={{ riak_mountpoint }}
@@ -32,7 +31,6 @@
             owner=root
             group=root
             mode=0750
-  notify: run riak_disk_tune
 
 - name: Add cron entry to tune disks upon startup
   cron: name="riak disk tune"
@@ -45,7 +43,6 @@
         owner=root
         group=root
         mode=0644
-  notify: restart riak
 
 - name: Update open file limits for Riak
   copy: src=etc_security_limits.d_riak.conf
@@ -53,7 +50,6 @@
         owner=root
         group=root
         mode=0644
-  notify: restart riak
 
 - name: Optimize Riak sysctl settings
   template: src=etc_sysctl.d_30-riak.conf.j2
@@ -61,7 +57,6 @@
             owner=root
             group=root
             mode=0644
-  notify: restart riak
 
 - name: Configuration CloudWatch logs
   copy: src=var_awslogs_etc_config_riak.conf
@@ -69,20 +64,19 @@
         owner=root
         group=root
         mode=0644
-  notify: restart awslogs
 
 - name: Install the Riak startup script
-  file: src=usr_local_bin_riak_startup.sh
+  copy: src=usr_local_bin_riak_startup.sh
         dest=/usr/local/bin/riak_startup.sh
         owner=root
         group=root
         mode=0750
-  notify: run riak_startup
 
 - name: Configuration Riak startup script to run upon startup
   cron: name="riak startup"
         job="/usr/local/bin/riak_startup.sh"
-        special_name="reboot"
+        special_time="reboot"
+        state=present
 
-- name: Ensure Riak is running and enabled
-  service: name=riak state=started enabled=yes
+- name: Ensure Riak is enabled
+  service: name=riak state=stopped enabled=yes
