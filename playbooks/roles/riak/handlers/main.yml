@@ -1,4 +1,0 @@
----
-
-- name: restart riak
-  service: name=riak state=restarted

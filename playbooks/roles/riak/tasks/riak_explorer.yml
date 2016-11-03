@@ -4,4 +4,22 @@
 - name: Download and extract Riak Explorer
   unarchive: src=https://github.com/basho-labs/riak_explorer/releases/download/0.2.0/riak_explorer-0.2.0-ubuntu-trusty-amd64.tar.gz
              dest=/usr/local
+             creates=/usr/local/riak_explorer/bin/riak_explorer
              copy=no
+
+- name: Install Riak Explorer configuration file
+  copy: src=usr_local_riak_explorer_etc_riak_explorer.conf
+        dest=/usr/local/riak_explorer/etc/riak_explorer.conf
+        owner=root
+        group=root
+        mode=0644
+
+- name: Install Riak Explorer upstart script
+  copy: src=etc_init_riak_explorer.conf
+        dest=/etc/init/riak_explorer.conf
+        owner=root
+        group=root
+        mode=0644
+
+- name: Ensure Riak Explorer is enabled
+  service: name=riak_explorer state=stopped enabled=yes
