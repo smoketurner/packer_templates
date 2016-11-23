@@ -1,56 +1,8 @@
 ---
 # Installs CloudWatch Logs Agent
 
-- name: Create /root/.aws/config directory
-  file: path=/root/.aws
-        state=directory
-        owner=root
-        group=root
-        mode=0755
-
-- name: Install boto configuration file
-  copy: src=root_.aws_config
-        dest=/root/.aws/config
-        owner=root
-        group=root
-        mode=0600
-
-- name: Create awslogs configuration directory
-  file: path=/var/awslogs/etc/config
-        state=directory
-        owner=root
-        group=root
-        mode=0755
-
-- name: Install temporary configuration file
-  copy: src=tmp_awslogs.conf
-        dest=/tmp/awslogs.conf
-        owner=root
-        group=root
-        mode=0644
-
-- name: Download and extract awslogs
-  get_url: url=https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py
-           dest=/tmp/awslogs-agent-setup.py
-           mode=0755
-
 - name: Install awslogs
-  command: python ./awslogs-agent-setup.py -r us-east-1 -n -c awslogs.conf
-           chdir=/tmp
-           creates=/var/awslogs/bin/pip
+  yum: name=awslogs state=present
 
-- name: Install the awslogs region correction script
-  copy: src=usr_local_bin_awslogs_region.sh
-        dest=/usr/local/bin/awslogs_region.sh
-        owner=root
-        group=root
-        mode=0750
-
-- name: Ensure the proper awslogs region upon startup
-  cron: name="awslogs region"
-        job="/usr/local/bin/awslogs_region.sh"
-        special_time="reboot"
-        state=present
-
-- name: Ensure awslogs is running and enabled
+- name: Ensure awslogs is stopped and enabled
   service: name=awslogs state=stopped enabled=yes

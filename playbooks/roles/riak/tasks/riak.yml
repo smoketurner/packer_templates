@@ -1,16 +1,35 @@
 ---
 # Installs Riak
 
-- name: Ensure repository key for packagecloud.io is in place
-  apt_key: url=https://packagecloud.io/gpg.key id=D59097AB state=present
+- name: Add basho_riak yum repository
+  yum_repository: name=basho_riak
+                  description=basho_riak
+                  file=basho_riak
+                  baseurl=https://packagecloud.io/basho/riak/el/6/$basearch
+                  repo_gpgcheck=yes
+                  gpgkey=https://packagecloud.io/basho/riak/gpgkey
+                  gpgcheck=no
+                  sslverify=yes
+                  sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+                  metadata_expire=300
 
-- name: Add packagecloud.io repository
-  apt_repository: repo="deb https://packagecloud.io/basho/riak/ubuntu/ trusty main"
-                  state=present
-                  update_cache=yes
+- name: Add basho_riak-source yum repository
+  yum_repository: name=basho_riak-source
+                  description=basho_riak-source
+                  file=basho_riak
+                  baseurl=https://packagecloud.io/basho/riak/el/6/SRPMS
+                  repo_gpgcheck=yes
+                  gpgkey=https://packagecloud.io/basho/riak/gpgkey
+                  gpgcheck=yes
+                  sslverify=yes
+                  sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+                  metadata_expire=300
 
 - name: Install Riak
-  apt: pkg=riak state=present update_cache=yes cache_valid_time=3600
+  yum: name=riak state=present update_cache=yes
+
+- name: Ensure Riak is stopped
+  service: name=riak state=stopped enabled=no
 
 - name: Copy riak.conf into place
   copy: src=etc_riak_riak.conf
@@ -59,8 +78,8 @@
             mode=0644
 
 - name: Configuration CloudWatch logs
-  copy: src=var_awslogs_etc_config_riak.conf
-        dest=/var/awslogs/etc/config/riak.conf
+  copy: src=etc_awslogs_config_riak.conf
+        dest=/etc/awslogs/config/riak.conf
         owner=root
         group=root
         mode=0644
@@ -77,6 +96,3 @@
         job="/usr/local/bin/riak_startup.sh"
         special_time="reboot"
         state=present
-
-- name: Ensure Riak is enabled
-  service: name=riak state=stopped enabled=yes

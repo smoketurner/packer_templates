@@ -3,4 +3,4 @@
 export AWS_PROFILE=jplock_packer
 #export PACKER_LOG=1
 
-packer build -debug riak.json
+packer build riak.json

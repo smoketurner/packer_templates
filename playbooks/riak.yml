@@ -3,10 +3,8 @@
 - name: localhost
   hosts: all
   become: yes
-  remote_user: ubuntu
+  remote_user: ec2-user
   roles:
     - common
-    - java
     - awslogs
-    - enhanced_networking
     - riak

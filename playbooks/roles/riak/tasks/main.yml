@@ -6,5 +6,5 @@
 - include: riak_metrics.yml
   tags: riak
 
-- include: riak_explorer.yml
-  tags: riak
+#- include: riak_explorer.yml
+#  tags: riak

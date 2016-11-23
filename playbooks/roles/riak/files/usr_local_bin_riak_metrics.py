@@ -10,7 +10,8 @@ client = boto3.client('cloudwatch')
 
 
 def get_instance_id():
-    instanceid = urllib2.urlopen('http://169.254.169.254/latest/meta-data/instance-id').read()
+    instanceid = urllib2.urlopen(
+        'http://169.254.169.254/latest/meta-data/instance-id').read()
     return instanceid
 
 
@@ -60,7 +61,12 @@ def publish(instance_id, stats):
         }
         MetricData.append(data)
 
-    value = int(float(stats['mem_allocated']) * 100 / float(stats['mem_total']))
+    if 'mem_total' in stats and stats['mem_total'] > 0:
+        value = int(float(stats['mem_allocated']) * 100 / float(
+            stats['mem_total']))
+    else:
+        value = 0
+
     data = {
         'MetricName': 'mem_allocated_%',
         'Dimensions': Dimensions,

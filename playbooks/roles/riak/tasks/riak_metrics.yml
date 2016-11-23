@@ -1,6 +1,20 @@
 ---
 # Installs Riak CloudWatch metrics script
 
+- name: Create /root/.aws/config directory
+  file: path=/root/.aws
+        state=directory
+        owner=root
+        group=root
+        mode=0755
+
+- name: Install boto configuration file
+  copy: src=root_.aws_config
+        dest=/root/.aws/config
+        owner=root
+        group=root
+        mode=0600
+
 - name: Install boto3
   pip: name=boto3 state=present
 

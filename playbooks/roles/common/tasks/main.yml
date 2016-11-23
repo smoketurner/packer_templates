@@ -1,31 +1,13 @@
 ---
 
-- name: Gather facts
-  action: ec2_facts
-
-- name: Update apt cache
-  apt: update_cache=yes cache_valid_time=3600
-
-- name: Upgrade all safe packages
-  apt: upgrade=safe
-
-- name: Install necessities and nice-to-haves
-  apt: pkg={{ item }} state=present
+- name: Install dependent packages
+  yum: name={{ item }} state=present
   with_items:
-    - htop
-    - atop
+    - pygpgme
+    - yum-utils
     - jq
     - wget
-    - apt-transport-https
-    - unattended-upgrades
-
-- name: Remove puppet and chef
-  apt: pkg={{ item }} state=absent force=yes
-  with_items:
-    - chef
-    - chef-zero
-    - puppet
-    - puppet-common
+    - htop
 
 - include: ntp.yml
   tags: ntp

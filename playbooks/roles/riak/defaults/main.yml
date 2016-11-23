@@ -11,4 +11,4 @@ riak_physical_disks:
   - xvda
 
 # options
-riak_scheduler:     noop
+riak_scheduler:     deadline
