@@ -1,13 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -xeuo pipefail
 
 grep -Fq "riak@127.0.0.1" /etc/riak/riak.conf
-FOUND=$?
-
-if [ $FOUND -eq 1 ]; then
-    exit 0
-fi
 
 IP_ADDRESS=`wget -q -O - http://169.254.169.254/latest/meta-data/local-ipv4`
 echo "Discovered IP address: ${IP_ADDRESS}"
